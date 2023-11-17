@@ -41,22 +41,22 @@ def main(rgb_list,depth_list,intrinsic_path,pose_path):
     pcd.points = o3d.utility.Vector3dVector(xyz)
     pcd.colors = o3d.utility.Vector3dVector(rgb / 255.0)  # 归一化RGB值到范围[0, 1]
     print("滤波前点云数量：",len(pcd.points))
-    # o3d.visualization.draw_geometries([pcd])
+    o3d.visualization.draw_geometries([pcd])
 
     # 统计滤波
-    pcd_sta_filtered = pcd.remove_statistical_outlier(nb_neighbors=2,std_ratio=0.5)
+    pcd_sta_filtered = pcd.remove_statistical_outlier(nb_neighbors=20,std_ratio=1.2)
     print("统计滤波后点云数量：",len(pcd_sta_filtered[0].points))
-    # o3d.visualization.draw_geometries([pcd,pcd_sta_filtered])
+    o3d.visualization.draw_geometries([pcd_sta_filtered[0]])
 
     # 半径滤波
-    pcd_ra_filtered = pcd.remove_radius_outlier(nb_points=5, radius=0.5)
-    print("半径滤波后点云数量：", len(pcd_sta_filtered[0].points))
-    o3d.visualization.draw_geometries([pcd, pcd_ra_filtered])
+    pcd_ra_filtered = pcd.remove_radius_outlier(nb_points=10, radius=0.05)
+    print("半径滤波后点云数量：", len(pcd_ra_filtered[0].points))
+    o3d.visualization.draw_geometries([pcd_ra_filtered[0]])
 
     # 体素下滤波
-    downsampled_pcd = pcd.voxel_down_sample(voxel_size=2.0)
-    print("体素下滤波后点云数量：", len(downsampled_pcd[0].points))
-    o3d.visualization.draw_geometries([pcd, downsampled_pcd])
+    downsampled_pcd = pcd.voxel_down_sample(voxel_size=0.05)
+    print("体素下滤波后点云数量：", len(downsampled_pcd.points))
+    o3d.visualization.draw_geometries([downsampled_pcd])
 
 if __name__=='__main__':
     intrinsic_path = '../data/intrinsic.txt'
