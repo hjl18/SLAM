@@ -1,6 +1,8 @@
 import numpy as np
 import os
 import open3d as o3d
+import open3d.io
+
 import read_intrinsic as ri
 import read_extrinsic as re
 import read_photo as rp
@@ -41,21 +43,25 @@ def main(rgb_list,depth_list,intrinsic_path,pose_path):
     pcd.points = o3d.utility.Vector3dVector(xyz)
     pcd.colors = o3d.utility.Vector3dVector(rgb / 255.0)  # 归一化RGB值到范围[0, 1]
     print("滤波前点云数量：",len(pcd.points))
+    open3d.io.write_point_cloud('../result/re.ply',pcd)
     o3d.visualization.draw_geometries([pcd])
 
     # 统计滤波
     pcd_sta_filtered = pcd.remove_statistical_outlier(nb_neighbors=20,std_ratio=1.2)
     print("统计滤波后点云数量：",len(pcd_sta_filtered[0].points))
+    open3d.io.write_point_cloud('../result/re_sta.ply', pcd_sta_filtered[0])
     o3d.visualization.draw_geometries([pcd_sta_filtered[0]])
 
     # 半径滤波
     pcd_ra_filtered = pcd.remove_radius_outlier(nb_points=10, radius=0.05)
     print("半径滤波后点云数量：", len(pcd_ra_filtered[0].points))
+    open3d.io.write_point_cloud('../result/re_ra.ply', pcd_ra_filtered[0])
     o3d.visualization.draw_geometries([pcd_ra_filtered[0]])
 
     # 体素下滤波
     downsampled_pcd = pcd.voxel_down_sample(voxel_size=0.05)
     print("体素下滤波后点云数量：", len(downsampled_pcd.points))
+    open3d.io.write_point_cloud('../result/re_downsampled.ply', downsampled_pcd)
     o3d.visualization.draw_geometries([downsampled_pcd])
 
 if __name__=='__main__':
